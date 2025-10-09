@@ -1,0 +1,129 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f6fa;
+    color: #2c3e50;
+    margin: 0;
+    padding: 0;
+}
+
+/* Image illustrative dans la description */
+.model-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0 25px 0;
+}
+
+.model-image img {
+    max-width: 90%;
+    height: auto;
+    border-radius: 12px;
+    border: 2px solid #e0e4ec;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.model-image img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 2.3em;
+    color: #1f3b73;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 0 25px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.card:hover { transform: translateY(-5px); }
+
+form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+form input, form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+form input[type="range"] {
+    accent-color: #007BFF;
+    margin-top: 10px;
+    width: 100%;
+}
+
+form button {
+    margin-top: 20px;
+    width: 100%;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+form button:hover {
+    opacity: 0.9;
+}
+
+.results-section h2, .visuals h3 {
+    text-align: center;
+    color: #1f3b73;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.visuals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 40px;
+}
+
+#tree_plot, #payoff_plot, #vol_plot, #greeks_plot {
+    height: 350px;
+}
+

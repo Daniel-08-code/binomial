@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Options Pro+</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <h1><i class="fa-solid fa-chart-line"></i> Dashboard de Valorisation d’Options</h1>
+        <p>Analyse comparative des modèles Black-Scholes, Binomial et Trinomial</p>
+    </header>
+
+    <section class="grid-2">
+        <!-- Description -->
+        <div class="card description">
+            <h2>🧠 Modèles de valorisation</h2>
+
+            <!-- 🔹 Image illustrative -->
+            <div class="model-image">
+            <img src="{{ url_for('static', filename='img/models_diagram.png') }}" alt="Illustration des modèles d'options">
+            </div>
+
+            <p>Explorez trois approches académiques de valorisation d’options :</p>
+            <ul>
+            <li><strong>Black-Scholes :</strong> modèle analytique avec calcul des <em>Greeks</em>.</li>
+            <li><strong>Binomial :</strong> approche discrète par arbre de prix.</li>
+            <li><strong>Trinomial :</strong> extension plus réaliste à trois branches.</li>
+            </ul>
+            <p>Utilisez le panneau de configuration pour modifier les paramètres et observer les effets sur les prix et les sensibilités.</p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="card form">
+            <h2>⚙️ Paramètres du modèle</h2>
+            <form method="POST">
+                <label>Prix du sous-jacent (S):</label>
+                <input type="number" name="S" value="100" step="0.01" required>
+
+                <label>Strike (K):</label>
+                <input type="number" name="K" value="105" step="0.01" required>
+
+                <label>Maturité (T en années):</label>
+                <input type="number" name="T" value="1" step="0.01" required>
+
+                <label>Taux sans risque (r):</label>
+                <input type="number" name="r" value="0.05" step="0.01" required>
+
+                <label>Volatilité (σ): <span id="sigma_val">0.2</span></label>
+                <input type="range" id="sigma_slider" name="sigma" min="0.01" max="1" step="0.01" value="0.2">
+
+                <label>Modèle:</label>
+                <select name="model" id="model_select">
+                    <option value="Black-Scholes">Black-Scholes</option>
+                    <option value="Binomial">Binomial</option>
+                    <option value="Trinomial">Trinomial</option>
+                </select>
+
+                <label>Nombre de périodes (N): <span id="N_val">10</span></label>
+                <input type="range" id="N_slider" name="N" min="1" max="50" value="10">
+
+                <button type="submit"><i class="fa-solid fa-calculator"></i> Calculer</button>
+            </form>
+        </div>
+    </section>
+
+    {% if result %}
+    <section class="results-section">
+        <h2>📈 Résultats de la valorisation</h2>
+        <div class="results-grid">
+            <div class="card"><strong>Prix :</strong> {{ result.price }}</div>
+            {% if result.delta %}
+            <div class="card"><strong>Δ Delta :</strong> {{ result.delta }}</div>
+            <div class="card"><strong>Γ Gamma :</strong> {{ result.gamma }}</div>
+            <div class="card"><strong>Vega :</strong> {{ result.vega }}</div>
+            <div class="card"><strong>Θ Theta :</strong> {{ result.theta }}</div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Visualisations -->
+    <section class="visuals">
+        {% if result.tree %}
+        <div class="card">
+            <h3>🌳 Arbre de valorisation</h3>
+            <div id="tree_plot"></div>
+        </div>
+        <script>
+            var tree_data = {{ result.tree | safe }};
+            Plotly.newPlot('tree_plot', tree_data.data, tree_data.layout);
+        </script>
+        {% endif %}
+
+        <div class="card"><h3>📊 Courbe de payoff</h3><div id="payoff_plot"></div></div>
+        <div class="card"><h3>💹 Sensibilité du prix à la volatilité</h3><div id="vol_plot"></div></div>
+        <div class="card"><h3>📉 Greeks - Analyse de Sensibilité</h3><div id="greeks_plot"></div></div>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+    // sliders
+    const sigmaSlider = document.getElementById('sigma_slider');
+    const sigmaVal = document.getElementById('sigma_val');
+    sigmaSlider.oninput = () => sigmaVal.textContent = sigmaSlider.value;
+
+    const NSlider = document.getElementById('N_slider');
+    const NVal = document.getElementById('N_val');
+    NSlider.oninput = () => NVal.textContent = NSlider.value;
+
+    // Exemple de graphiques Plotly pour le front-end (tu peux relier aux résultats Flask)
+    Plotly.newPlot('payoff_plot', [{
+        x: [80, 90, 100, 110, 120],
+        y: [0, 0, 0, 5, 15],
+        type: 'scatter',
+        fill: 'tozeroy'
+    }], {title: 'Payoff (Option Call)', xaxis: {title: 'Prix du sous-jacent'}, yaxis: {title: 'Gain'}});
+
+    Plotly.newPlot('vol_plot', [{
+        x: [0.1, 0.2, 0.3, 0.4, 0.5],
+        y: [5, 8, 12, 18, 25],
+        type: 'scatter'
+    }], {title: 'Impact de la volatilité sur le prix'});
+
+    Plotly.newPlot('greeks_plot', [
+        {x: [0.1, 0.2, 0.3, 0.4, 0.5], y: [0.6, 0.55, 0.5, 0.45, 0.4], name: 'Delta'},
+        {x: [0.1, 0.2, 0.3, 0.4, 0.5], y: [0.01, 0.015, 0.02, 0.018, 0.016], name: 'Gamma'}
+    ], {title: 'Variation des Greeks selon σ', legend: {orientation: 'h'}});
+</script>
+
+</body>
+</html>
